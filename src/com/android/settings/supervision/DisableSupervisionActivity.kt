@@ -19,11 +19,18 @@ import android.app.admin.DevicePolicyManager
 import android.app.role.RoleManager
 import android.app.role.RoleManager.ROLE_SUPERVISION
 import android.app.supervision.SupervisionManager
+import android.app.supervision.flags.Flags
 import android.os.Bundle
+import android.os.UserManager
 import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
+import com.android.settings.supervision.shared.areAnyUsersExceptCurrentSupervised
+import com.android.settings.supervision.shared.deleteSupervisionData
+import com.android.settings.supervision.shared.isSupervisionPackageProfileOwner
+import com.android.settings.supervision.shared.supervisionRoleHolders
+import com.android.settings.supervision.shared.systemSupervisionPackageName
 import com.android.settingslib.supervision.SupervisionLog.TAG
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.launch
@@ -31,8 +38,9 @@ import kotlinx.coroutines.launch
 /**
  * Activity for disabling device supervision.
  *
- * This activity is only available to the system supervision role holder. It disables device
- * supervision and finishes the activity with `Activity.RESULT_OK`.
+ * This activity is only available to supervision role holders. It removes the supervision role from
+ * the calling package and disables supervision if there are no other supervision role holders
+ * remaining.
  */
 class DisableSupervisionActivity : FragmentActivity() {
 
@@ -57,10 +65,26 @@ class DisableSupervisionActivity : FragmentActivity() {
         val otherSupervisionApps = supervisionApps.filter { it != callingPackage }
         // If there are no other supervision apps, we can disable supervision.
         if (otherSupervisionApps.isEmpty()) {
-            // Delete supervision data if possible (i.e single supervised user).
-            if (!deleteSupervisionData()) {
-                // Only disable supervision, in case we can't delete data.
-                supervisionManager.setSupervisionEnabled(false)
+            if (Flags.enableSupervisionSettingsUiUpdates()) {
+                val userManager = getSystemService(UserManager::class.java)
+                // If there are no other supervision apps and no other users are
+                // supervised, we can delete supervision data.
+                val noOtherUsersAreSupervised =
+                    userManager != null &&
+                        !areAnyUsersExceptCurrentSupervised(supervisionManager, userManager)
+                // Delete supervision data if possible (i.e. single supervised user)
+                val deleteSupervisionDataSuccess =
+                    noOtherUsersAreSupervised && deleteSupervisionData(disableSupervision = true)
+                if (!deleteSupervisionDataSuccess) {
+                    // Only disable supervision, in case we can't delete data.
+                    supervisionManager.setSupervisionEnabled(false)
+                }
+            } else {
+                // Delete supervision data if possible (i.e single supervised user).
+                if (!deleteSupervisionData(disableSupervision = true)) {
+                    // Only disable supervision, in case we can't delete data.
+                    supervisionManager.setSupervisionEnabled(false)
+                }
             }
         }
 

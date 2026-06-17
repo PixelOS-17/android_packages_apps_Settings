@@ -123,26 +123,30 @@ class FaceEnroll : AppCompatActivity() {
                     BiometricsOnboardingProto.OnboardingResult.RESULT_SKIP_VALUE
                 else if (resultCode == RESULT_TIMEOUT)
                     BiometricsOnboardingProto.OnboardingResult.RESULT_TIMEOUT_VALUE
-                else
-                    BiometricsOnboardingProto.OnboardingResult.RESULT_UNKNOWN_VALUE
+                else BiometricsOnboardingProto.OnboardingResult.RESULT_UNKNOWN_VALUE
             ev.duration = SystemClock.elapsedRealtime() - startTimeMillis
             data?.putExtra(BiometricsLogger.EXTRA_BIOMETRICS_ONBOARDING_EVENT, ev)
-            featureFactory.biometricsFeatureProvider
-                .biometricsLogger?.logSettingsBiometricsOnboarding(ev)
+            featureFactory.biometricsFeatureProvider.biometricsLogger
+                ?.logSettingsBiometricsOnboarding(ev)
         }
-        if(BiometricsLogger.LOGGABLE) {
+        if (BiometricsLogger.LOGGABLE) {
             Log.d(
-                BiometricsLogger.TAG, "${javaClass.getSimpleName()}: " + " received event=" + event
+                BiometricsLogger.TAG,
+                "${javaClass.getSimpleName()}: " + " received event=" + event,
             )
         }
     }
 
     private fun getOnboardingEventFromIntent(data: Intent?): OnboardingEvent? {
         val logger = featureFactory.biometricsFeatureProvider.biometricsLogger
-        if (logger != null && data != null
-            && data.hasExtra(BiometricsLogger.EXTRA_BIOMETRICS_ONBOARDING_EVENT_BYTES)) {
+        if (
+            logger != null &&
+                data != null &&
+                data.hasExtra(BiometricsLogger.EXTRA_BIOMETRICS_ONBOARDING_EVENT_BYTES)
+        ) {
             return logger.messageByteArrayToEvent(
-                data.getByteArrayExtra(BiometricsLogger.EXTRA_BIOMETRICS_ONBOARDING_EVENT_BYTES))
+                data.getByteArrayExtra(BiometricsLogger.EXTRA_BIOMETRICS_ONBOARDING_EVENT_BYTES)
+            )
         }
         return null
     }

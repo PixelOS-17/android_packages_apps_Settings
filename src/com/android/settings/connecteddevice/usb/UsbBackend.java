@@ -243,7 +243,6 @@ public class UsbBackend {
                 usbDevice.getVendorId(),
                 usbDevice.getProductId());
     }
-    }
 
     public static String usbFunctionsToString(long functions) {
         // TODO replace with UsbManager.usbFunctionsToString once supported by Roboelectric

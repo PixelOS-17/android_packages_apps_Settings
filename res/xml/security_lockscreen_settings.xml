@@ -42,12 +42,6 @@
             settings:searchable="false"
             settings:controller="com.android.settings.biometrics.face.FaceSettingsLockscreenBypassPreferenceController" />
 
-        <com.android.settingslib.PrimarySwitchPreference
-            android:key="widgets_on_lockscreen"
-            android:title="@string/widgets_on_lockscreen_title"
-            android:fragment="com.android.settings.communal.WidgetsOnLockscreenFragment"
-            settings:controller="com.android.settings.display.WidgetsOnLockscreenPreferenceController"/>
-
         <com.android.settingslib.RestrictedSwitchPreference
             android:key="security_lockscreen_add_users_when_locked"
             android:title="@string/user_add_on_lockscreen_menu"
@@ -102,14 +96,6 @@
         settings:controller="com.android.settings.display.AmbientDisplayWhenToShowPreferenceController"
         android:order="1000">
 
-        <com.android.settingslib.RestrictedSwitchPreference
-            android:key="ambient_display_always_on"
-            android:title="@string/doze_always_on_title"
-            android:summary="@string/doze_always_on_summary"
-            settings:keywords="@string/keywords_always_show_time_info"
-            settings:controller="com.android.settings.display.AmbientDisplayAlwaysOnPreferenceController"
-            settings:userRestriction="no_ambient_display" />
-
         <com.android.settingslib.PrimarySwitchPreference
             android:key="gesture_tap"
             android:title="@string/ambient_display_tap_screen_title"
@@ -130,13 +116,6 @@
             android:fragment="com.android.settings.gestures.PickupGestureSettings"
             settings:searchable="false"
             settings:controller="com.android.settings.gestures.PickupGesturePreferenceController" />
-        
-        <SwitchPreferenceCompat
-            android:key="gesture_screen_off_udfps"
-            android:title="@string/ambient_display_screen_off_udfps_title"
-            android:summary="@string/ambient_display_screen_off_udfps_summary"
-            settings:keywords="@string/keywords_gesture"
-            settings:controller="com.android.settings.gestures.ScreenOffUdfpsPreferenceController" />
 
         <!-- Actually controls doze enablement -->
         <SwitchPreferenceCompat

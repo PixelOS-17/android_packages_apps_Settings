@@ -15,6 +15,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
 
+import com.android.internal.util.PropImitationHooks;
 import com.android.settings.R;
 
 import java.io.BufferedReader;
@@ -60,6 +61,7 @@ public class PifDataPreference extends Preference {
         deleteButton.setOnClickListener(v -> {
             Settings.Secure.putString(getContext().getContentResolver(),
                     Settings.Secure.PIF_DATA, null);
+            PropImitationHooks.publishPifProps(getContext());
             Toast.makeText(getContext(), "User PIF data cleared", Toast.LENGTH_SHORT).show();
             callChangeListener(null);
 
@@ -88,6 +90,7 @@ public class PifDataPreference extends Preference {
 
             Settings.Secure.putString(getContext().getContentResolver(),
                     Settings.Secure.PIF_DATA, json);
+            PropImitationHooks.publishPifProps(getContext());
             Toast.makeText(getContext(), "JSON file loaded", Toast.LENGTH_SHORT).show();
             callChangeListener(json);
 

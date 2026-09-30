@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.Settings;
+import android.security.trickystore.TrickyStoreService;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ImageButton;
@@ -14,7 +15,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
 
-import com.android.internal.util.custom.KeyProviderManager;
 import com.android.settings.R;
 
 import java.io.BufferedReader;
@@ -82,7 +82,7 @@ public class KeyboxDataPreference extends Preference {
             }
 
             String xml = xmlContent.toString();
-            if (!KeyProviderManager.isValidKeyboxXml(xml)) {
+            if (!TrickyStoreService.isValidKeyboxXml(xml)) {
                 Toast.makeText(getContext(), "Invalid XML: missing required data", Toast.LENGTH_SHORT).show();
                 return;
             }

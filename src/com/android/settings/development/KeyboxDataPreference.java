@@ -67,6 +67,7 @@ public class KeyboxDataPreference extends Preference {
                     Settings.Secure.KEYBOX_DATA, null);
             Toast.makeText(getContext(), "XML data cleared", Toast.LENGTH_SHORT).show();
             callChangeListener(null);
+            TrickyStoreClients.forceStop(getContext());
         });
     }
 
@@ -95,6 +96,7 @@ public class KeyboxDataPreference extends Preference {
                     Settings.Secure.KEYBOX_DATA, xml);
             Toast.makeText(getContext(), "XML file loaded", Toast.LENGTH_SHORT).show();
             callChangeListener(xml);
+            TrickyStoreClients.forceStop(getContext());
 
         } catch (IOException e) {
             Log.e(TAG, "Failed to read XML file", e);

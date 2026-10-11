@@ -16,7 +16,6 @@
  */
 package com.android.settings.development;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -70,12 +69,6 @@ public class TrickyStoreTargetAppsFragment extends Fragment {
 
     private static final String TAG = "TrickyStoreTargets";
     private static final String NONE_SELECTED = "#";
-
-    private static final String[] RESTART_PACKAGES = {
-            "com.google.android.gms",
-            "com.android.vending",
-            "com.google.android.apps.walletnfcrel",
-    };
 
     public enum TargetMode {
         AUTO(""),
@@ -369,22 +362,7 @@ public class TrickyStoreTargetAppsFragment extends Fragment {
     }
 
     private void forceStopClients() {
-        Context context = getContext();
-        if (context == null) {
-            return;
-        }
-        ActivityManager am = context.getSystemService(ActivityManager.class);
-        if (am == null) {
-            return;
-        }
-        for (String pkg : RESTART_PACKAGES) {
-            try {
-                am.forceStopPackage(pkg);
-                Log.i(TAG, pkg + " process killed");
-            } catch (SecurityException e) {
-                Log.w(TAG, "Failed to stop " + pkg, e);
-            }
-        }
+        TrickyStoreClients.forceStop(getContext());
     }
 
     private Set<String> effectiveTargets(@Nullable String stored) {

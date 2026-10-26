@@ -43,12 +43,6 @@
         android:title="@string/spoofing_identity_category">
 
         <Preference
-            android:key="user_selectable_app_spoofing"
-            android:title="@string/user_selectable_app_spoofing_title"
-            android:summary="@string/user_selectable_app_spoofing_summary"
-            android:fragment="com.android.settings.development.spoof.AppSpoofFragment" />
-
-        <Preference
             android:key="pi_pp_spoof"
             android:title="@string/spoofing_pixel_props_title"
             android:summary="@string/spoofing_pixel_props_summary"

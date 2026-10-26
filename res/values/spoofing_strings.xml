@@ -16,7 +16,7 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="spoofing_title">Spoofing</string>
-    <string name="spoofing_summary">Play Integrity, device identity, and per-app profiles</string>
+    <string name="spoofing_summary">Play Integrity, device identity, and app overrides</string>
     <string name="spoofing_integrity_category">Integrity</string>
     <string name="spoofing_identity_category">Device identity</string>
     <string name="spoofing_features_category">Hardware features</string>
@@ -26,8 +26,6 @@
     <string name="tricky_store_summary">Keybox and target apps for attestation</string>
     <string name="play_integrity_fix_title">Play Integrity Fix</string>
     <string name="play_integrity_fix_summary">Fingerprint and build fields served to DroidGuard</string>
-    <string name="user_selectable_app_spoofing_title">App and game spoofing</string>
-    <string name="user_selectable_app_spoofing_summary">Spoof device properties for selected apps</string>
     <string name="spoofing_pixel_props_title">Pixel props</string>
     <string name="spoofing_pixel_props_summary">Spoof selected apps as a Pixel</string>
     <string name="tensor_spoof_title">Tensor spoofing</string>
@@ -39,7 +37,7 @@
 
     <string name="spoofing_reset_defaults_title">Reset to defaults</string>
     <string name="spoofing_reset_defaults_dialog_title">Reset spoofing settings?</string>
-    <string name="spoofing_reset_defaults_dialog_message">This clears the Play Integrity config, the security patch override, and the game-props config, and restores the default TrickyStore target list. The keybox and the enable switches are kept. A new fingerprint is fetched shortly afterwards.</string>
+    <string name="spoofing_reset_defaults_dialog_message">This clears the Play Integrity config and the security patch override, and restores the default TrickyStore target list. The keybox and the enable switches are kept. A new fingerprint is fetched shortly afterwards.</string>
     <string name="spoofing_reset_defaults_confirm">Reset</string>
     <string name="spoofing_reset_defaults_done">Spoofing settings reset</string>
 
@@ -112,22 +110,7 @@
     <string name="pp_targets">Target apps</string>
 
     <string name="tensor_enable">Tensor spoofing</string>
-    <string name="app_spoof_enable">Spoof selected apps</string>
     <string name="spoof_show_system">Show system apps</string>
     <string name="spoof_filter">Filter</string>
     <string name="spoof_no_apps">No matching apps</string>
-    <string name="spoof_choose_profile">Spoof profile</string>
-    <string name="spoof_profile_off">Do not spoof</string>
-    <string name="spoof_add_profile">Add custom profile</string>
-    <string name="spoof_profile_saved">Profile saved</string>
-    <string name="spoof_profile_incomplete">Name, brand, manufacturer, device, and model are required</string>
-    <string name="spoof_delete_profile">Delete <xliff:g id="name" example="My phone">%1$s</xliff:g>?</string>
-    <string name="spoof_custom_profiles">Custom profiles</string>
-    <string name="custom_spoof_profile_name">Profile name</string>
-    <string name="custom_spoof_profile_brand">Brand</string>
-    <string name="custom_spoof_profile_manufacturer">Manufacturer</string>
-    <string name="custom_spoof_profile_device">Device</string>
-    <string name="custom_spoof_profile_model">Model</string>
-    <string name="custom_spoof_profile_fingerprint">Fingerprint (optional)</string>
-    <string name="custom_spoof_profile_product">Product (optional)</string>
 </resources>

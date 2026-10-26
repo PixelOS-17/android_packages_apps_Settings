@@ -22,9 +22,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.security.gameprops.GamePropsSpoofService;
 import android.security.trickystore.TrickyStoreService;
-import android.text.TextUtils;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.preference.CheckBoxPreference;
@@ -48,14 +46,13 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Package picker for TrickyStore targets, Tensor targets, Pixel-prop targets,
- * and per-app device profiles. Each mode writes the setting format its service
- * parses.
+ * Package picker for TrickyStore targets, Tensor targets, and Pixel-prop
+ * targets. Each mode writes the setting format its service parses.
  */
 public abstract class SpoofAppListFragment extends SettingsPreferenceFragment
         implements DeveloperOptionAwareMixin {
 
-    enum Mode { TRICKY, TENSOR, PIXEL, APP }
+    enum Mode { TRICKY, TENSOR, PIXEL }
 
     private static final String[] EXCLUDED_SUFFIXES = {
             ".auto_generated", ".appsearch", ".backup", ".carrier",
@@ -74,7 +71,6 @@ public abstract class SpoofAppListFragment extends SettingsPreferenceFragment
     private boolean mShowSystem;
     private String mQuery = "";
     private boolean mLoaded;
-    private boolean mAppSpoofEnabled = true;
 
     static final class Row {
         final String pkg;
@@ -137,29 +133,6 @@ public abstract class SpoofAppListFragment extends SettingsPreferenceFragment
 
     protected void onRefresh() {}
 
-    /** Per-app spoof keeps its selection in the cache while the master switch is off. */
-    protected void setAppSpoofEnabled(boolean enabled) {
-        ContentResolver cr = requireContext().getContentResolver();
-        String active = SpoofStore.getString(cr, Settings.Secure.PER_APPS_DEVICE_SPOOF);
-        String cache = SpoofStore.getString(cr, Settings.Secure.PER_APPS_DEVICE_SPOOF_CACHE);
-        Set<String> stop = new HashSet<>();
-        stop.addAll(SpoofStore.readPairMap(active).keySet());
-        stop.addAll(SpoofStore.readPairMap(cache).keySet());
-        if (enabled) {
-            if (TextUtils.isEmpty(active)) {
-                SpoofStore.putString(cr, Settings.Secure.PER_APPS_DEVICE_SPOOF,
-                        cache == null ? "" : cache);
-            }
-        } else {
-            SpoofStore.putString(cr, Settings.Secure.PER_APPS_DEVICE_SPOOF_CACHE,
-                    active == null ? "" : active);
-            SpoofStore.putString(cr, Settings.Secure.PER_APPS_DEVICE_SPOOF, "");
-        }
-        SpoofStore.putInt(cr, false, Settings.Secure.PER_APPS_DEVICE_SPOOF_ENABLED, enabled ? 1 : 0);
-        mAppSpoofEnabled = enabled;
-        SpoofStore.stopPackages(requireContext(), stop.toArray(new String[0]));
-    }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -172,18 +145,13 @@ public abstract class SpoofAppListFragment extends SettingsPreferenceFragment
         mLoaded = true;
         ContentResolver cr = requireContext().getContentResolver();
         seedIfUnset(cr);
-        if (mode() == Mode.APP) {
-            mAppSpoofEnabled = SpoofStore.getInt(cr, false,
-                    Settings.Secure.PER_APPS_DEVICE_SPOOF_ENABLED, 1) != 0;
-        }
         PackageManager pm = requireContext().getPackageManager();
         Set<String> hidden = mode() == Mode.TENSOR
                 ? new HashSet<>(java.util.Arrays.asList(getResources().getStringArray(
                         R.array.tensor_targets_hidden_apps)))
                 : Collections.emptySet();
-        final boolean appEnabled = mAppSpoofEnabled;
         new Thread(() -> {
-            List<Row> rows = query(pm, cr, hidden, appEnabled);
+            List<Row> rows = query(pm, cr, hidden);
             android.app.Activity activity = getActivity();
             if (activity == null) return;
             activity.runOnUiThread(() -> {
@@ -209,8 +177,7 @@ public abstract class SpoofAppListFragment extends SettingsPreferenceFragment
         }
     }
 
-    private List<Row> query(PackageManager pm, ContentResolver cr, Set<String> hidden,
-            boolean appEnabled) {
+    private List<Row> query(PackageManager pm, ContentResolver cr, Set<String> hidden) {
         Set<String> selected = new HashSet<>();
         Map<String, String> extras = Collections.emptyMap();
         switch (mode()) {
@@ -231,16 +198,6 @@ public abstract class SpoofAppListFragment extends SettingsPreferenceFragment
                 } else {
                     selected.addAll(stored);
                 }
-                break;
-            case APP:
-                String active = SpoofStore.getString(cr, Settings.Secure.PER_APPS_DEVICE_SPOOF);
-                String cache = SpoofStore.getString(cr, Settings.Secure.PER_APPS_DEVICE_SPOOF_CACHE);
-                Map<String, String> shown = SpoofStore.readPairMap(appEnabled ? active : cache);
-                if (appEnabled && shown.isEmpty()) {
-                    shown = SpoofStore.readPairMap(cache);
-                }
-                extras = shown;
-                selected.addAll(shown.keySet());
                 break;
             default:
                 break;
@@ -326,23 +283,18 @@ public abstract class SpoofAppListFragment extends SettingsPreferenceFragment
         pref.setSummary(summaryFor(row));
         pref.setPersistent(false);
         pref.setOnPreferenceClickListener(p -> {
-            if (mode() == Mode.TRICKY) showModeDialog(row, pref);
-            else showProfileDialog(row, pref);
+            showModeDialog(row, pref);
             return true;
         });
         return pref;
     }
 
     private String summaryFor(Row row) {
-        if (mode() == Mode.TRICKY) {
-            if (!row.selected) return getString(R.string.ts_mode_off);
-            if ("?".equals(row.extra)) return getString(R.string.ts_mode_leaf);
-            if ("!".equals(row.extra)) return getString(R.string.ts_mode_cert);
-            if ("-".equals(row.extra)) return getString(R.string.ts_mode_skip);
-            return getString(R.string.ts_mode_auto);
-        }
-        if (!row.selected || row.extra.isEmpty()) return getString(R.string.spoof_profile_off);
-        return profileLabel(row.extra);
+        if (!row.selected) return getString(R.string.ts_mode_off);
+        if ("?".equals(row.extra)) return getString(R.string.ts_mode_leaf);
+        if ("!".equals(row.extra)) return getString(R.string.ts_mode_cert);
+        if ("-".equals(row.extra)) return getString(R.string.ts_mode_skip);
+        return getString(R.string.ts_mode_auto);
     }
 
     private void showModeDialog(Row row, Preference pref) {
@@ -376,59 +328,6 @@ public abstract class SpoofAppListFragment extends SettingsPreferenceFragment
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
-    }
-
-    private void showProfileDialog(Row row, Preference pref) {
-        List<String> ids = new ArrayList<>();
-        List<String> labels = new ArrayList<>();
-        ids.add("");
-        labels.add(getString(R.string.spoof_profile_off));
-        List<String> builtin = new ArrayList<>(GamePropsSpoofService.BUILTIN_PROFILES.keySet());
-        Collections.sort(builtin);
-        for (String id : builtin) {
-            ids.add(id);
-            labels.add(profileLabel(id));
-        }
-        for (SpoofStore.CustomProfile profile : SpoofStore.readCustomProfiles(
-                requireContext().getContentResolver())) {
-            ids.add(profile.id);
-            labels.add(profile.name);
-        }
-        int checked = 0;
-        if (row.selected) {
-            for (int i = 0; i < ids.size(); i++) {
-                if (ids.get(i).equals(row.extra)) checked = i;
-            }
-        }
-        new AlertDialog.Builder(requireContext())
-                .setTitle(R.string.spoof_choose_profile)
-                .setSingleChoiceItems(labels.toArray(new String[0]), checked, (d, which) -> {
-                    if (which == 0) {
-                        row.selected = false;
-                        row.extra = "";
-                    } else {
-                        row.selected = true;
-                        row.extra = ids.get(which);
-                    }
-                    pref.setSummary(summaryFor(row));
-                    save();
-                    SpoofStore.stopPackages(requireContext(), row.pkg);
-                    d.dismiss();
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .show();
-    }
-
-    private String profileLabel(String id) {
-        Map<String, Object> props = GamePropsSpoofService.BUILTIN_PROFILES.get(id);
-        if (props != null && props.get("MODEL") != null) {
-            return String.valueOf(props.get("MODEL"));
-        }
-        for (SpoofStore.CustomProfile profile : SpoofStore.readCustomProfiles(
-                requireContext().getContentResolver())) {
-            if (id.equals(profile.id)) return profile.name;
-        }
-        return id;
     }
 
     private void save() {
@@ -472,28 +371,6 @@ public abstract class SpoofAppListFragment extends SettingsPreferenceFragment
                     if (row.selected && seen.add(row.pkg)) out.add(row.pkg);
                 }
                 SpoofStore.putString(cr, key, SpoofStore.writeCsv(out));
-                break;
-            }
-            case APP: {
-                String active = SpoofStore.getString(cr, Settings.Secure.PER_APPS_DEVICE_SPOOF);
-                String cache = SpoofStore.getString(cr, Settings.Secure.PER_APPS_DEVICE_SPOOF_CACHE);
-                Map<String, String> shown = SpoofStore.readPairMap(mAppSpoofEnabled ? active : cache);
-                if (mAppSpoofEnabled && shown.isEmpty()) {
-                    shown = SpoofStore.readPairMap(cache);
-                }
-                Map<String, String> out = new LinkedHashMap<>();
-                for (Map.Entry<String, String> entry : shown.entrySet()) {
-                    if (!visible.contains(entry.getKey())) {
-                        out.put(entry.getKey(), entry.getValue());
-                    }
-                }
-                for (Row row : mRows) {
-                    if (row.selected && !row.extra.isEmpty()) out.put(row.pkg, row.extra);
-                }
-                String encoded = SpoofStore.writePairMap(out);
-                SpoofStore.putString(cr, Settings.Secure.PER_APPS_DEVICE_SPOOF_CACHE, encoded);
-                SpoofStore.putString(cr, Settings.Secure.PER_APPS_DEVICE_SPOOF,
-                        mAppSpoofEnabled ? encoded : "");
                 break;
             }
             default:

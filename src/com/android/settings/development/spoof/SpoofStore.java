@@ -45,9 +45,8 @@ import java.util.Map;
 
 /**
  * Reads and writes the spoof settings the framework services already consume.
- * Value formats are part of that contract: keyboxes are Base64 of the XML,
- * TrickyStore targets are one package per line with a mode suffix, and the
- * per-app map is comma-separated {@code package:profile} pairs.
+ * Value formats are part of that contract: keyboxes are Base64 of the XML, and
+ * TrickyStore targets are one package per line with a mode suffix.
  */
 final class SpoofStore {
     private static final String TAG = "SpoofStore";
@@ -128,7 +127,6 @@ final class SpoofStore {
         putString(cr, Settings.Secure.SPOOF_TRICKYSTORE_TARGET,
                 TrickyStoreService.DEFAULT_TARGET_LIST);
         putString(cr, Settings.Secure.SPOOF_TRICKYSTORE_PATCH, "");
-        putString(cr, Settings.Secure.SPOOF_GAMEPROPS_CONFIG, "");
         putString(cr, Settings.Secure.SPOOF_PIF_CONFIG, "");
     }
 
@@ -335,27 +333,6 @@ final class SpoofStore {
         return sb.toString();
     }
 
-    static Map<String, String> readPairMap(String stored) {
-        Map<String, String> out = new LinkedHashMap<>();
-        if (TextUtils.isEmpty(stored)) return out;
-        for (String entry : stored.split(",")) {
-            String[] parts = entry.split(":");
-            if (parts.length == 2 && !parts[0].trim().isEmpty() && !parts[1].trim().isEmpty()) {
-                out.put(parts[0].trim(), parts[1].trim());
-            }
-        }
-        return out;
-    }
-
-    static String writePairMap(Map<String, String> values) {
-        StringBuilder sb = new StringBuilder();
-        for (Map.Entry<String, String> entry : values.entrySet()) {
-            if (sb.length() > 0) sb.append(',');
-            sb.append(entry.getKey()).append(':').append(entry.getValue());
-        }
-        return sb.toString();
-    }
-
     static List<String> readCsv(String stored) {
         List<String> out = new ArrayList<>();
         if (TextUtils.isEmpty(stored)) return out;
@@ -364,71 +341,6 @@ final class SpoofStore {
             if (!pkg.isEmpty()) out.add(pkg);
         }
         return out;
-    }
-
-    static final class CustomProfile {
-        final String id;
-        final String name;
-        final String brand;
-        final String manufacturer;
-        final String device;
-        final String model;
-        final String fingerprint;
-        final String product;
-
-        CustomProfile(String id, String name, String brand, String manufacturer, String device,
-                String model, String fingerprint, String product) {
-            this.id = id;
-            this.name = name;
-            this.brand = brand;
-            this.manufacturer = manufacturer;
-            this.device = device;
-            this.model = model;
-            this.fingerprint = fingerprint;
-            this.product = product;
-        }
-    }
-
-    static List<CustomProfile> readCustomProfiles(ContentResolver cr) {
-        List<CustomProfile> out = new ArrayList<>();
-        String raw = getString(cr, Settings.Secure.CUSTOM_SPOOF_PROFILES);
-        if (TextUtils.isEmpty(raw)) return out;
-        try {
-            JSONArray array = new JSONArray(raw);
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject obj = array.getJSONObject(i);
-                out.add(new CustomProfile(
-                        obj.getString("id"),
-                        obj.optString("name", obj.getString("id")),
-                        obj.optString("brand", ""),
-                        obj.optString("manufacturer", ""),
-                        obj.optString("device", ""),
-                        obj.optString("model", ""),
-                        obj.optString("fingerprint", ""),
-                        obj.optString("product", "")));
-            }
-        } catch (JSONException e) {
-            Log.w(TAG, "Unreadable custom spoof profiles", e);
-        }
-        return out;
-    }
-
-    static void writeCustomProfiles(ContentResolver cr, List<CustomProfile> profiles)
-            throws JSONException {
-        JSONArray array = new JSONArray();
-        for (CustomProfile profile : profiles) {
-            JSONObject obj = new JSONObject();
-            obj.put("id", profile.id);
-            obj.put("name", profile.name);
-            obj.put("brand", profile.brand);
-            obj.put("manufacturer", profile.manufacturer);
-            obj.put("device", profile.device);
-            obj.put("model", profile.model);
-            obj.put("fingerprint", profile.fingerprint);
-            obj.put("product", profile.product);
-            array.put(obj);
-        }
-        putString(cr, Settings.Secure.CUSTOM_SPOOF_PROFILES, array.toString());
     }
 
     static String writeCsv(Iterable<String> values) {

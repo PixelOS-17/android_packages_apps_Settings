@@ -50,6 +50,9 @@
     <string name="pif_delete_message">The saved fingerprint is removed. A new one is fetched shortly afterwards.</string>
     <string name="pif_imported">Configuration imported</string>
     <string name="pif_fetched_model">Fetched fingerprint for <xliff:g id="model" example="Pixel 6a">%1$s</xliff:g></string>
+    <string name="pif_wipe_playstore_title">Clear Play Store data?</string>
+    <string name="pif_wipe_playstore_message">Applying this fingerprint works best with a fresh Play Store session. Clear Play Store app data now? This signs you out and clears its local cache and download queue.</string>
+    <string name="pif_wipe_confirm">Clear data</string>
     <string name="pif_failed">Failed: <xliff:g id="error" example="timeout">%1$s</xliff:g></string>
     <string name="pif_invalid_fingerprint">Invalid fingerprint format</string>
     <string name="pif_no_devices">No devices found</string>
@@ -83,6 +86,7 @@
     <string name="ts_delete_keybox_title">Delete keybox?</string>
     <string name="ts_delete_keybox_message">The installed keybox is removed. An official one can be fetched again.</string>
     <string name="ts_keybox_imported">Keybox imported</string>
+    <string name="ts_wipe_playstore_message">Play Store caches integrity verdicts. Clear its data now so the new keybox takes effect? This signs you out and clears its local cache and download queue.</string>
     <string name="ts_keybox_deleted">Keybox deleted</string>
     <string name="ts_keybox_fetched">Keybox fetched</string>
     <string name="ts_keybox_same">Keybox is already current</string>

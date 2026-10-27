@@ -267,6 +267,7 @@ public class PifSettings extends DashboardFragment implements DeveloperOptionAwa
             SpoofStore.updatePatchIfSimple(cr, json.optString("SECURITY_PATCH", ""));
             SpoofStore.stopGms(requireContext());
             toast(getString(R.string.pif_imported));
+            SpoofStore.confirmClearPlayStore(requireContext(), R.string.pif_wipe_playstore_message);
             refresh();
         } catch (Exception e) {
             toast(getString(R.string.pif_failed, e.getMessage()));
@@ -349,6 +350,7 @@ public class PifSettings extends DashboardFragment implements DeveloperOptionAwa
             SpoofStore.updatePatchIfSimple(cr, profile.securityPatch);
             SpoofStore.stopGms(requireContext());
             toast(getString(R.string.pif_fetched_model, profile.model));
+            SpoofStore.confirmClearPlayStore(requireContext(), R.string.pif_wipe_playstore_message);
             refresh();
         } catch (JSONException e) {
             toast(getString(R.string.pif_failed, e.getMessage()));

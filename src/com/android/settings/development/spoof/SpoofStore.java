@@ -27,7 +27,10 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
+import androidx.appcompat.app.AlertDialog;
+
 import com.android.internal.util.custom.PixelDeviceRepository;
+import com.android.settings.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -121,6 +124,28 @@ final class SpoofStore {
         stopPackages(context, GMS_FAMILY);
     }
 
+    /**
+     * Play Store keeps the certification result in its own data. Force-stopping
+     * it does not drop that cache. The caller has already saved the new
+     * fingerprint or keybox; this only asks before wiping Play Store data.
+     */
+    static void confirmClearPlayStore(Context context, int messageRes) {
+        if (context == null) return;
+        new AlertDialog.Builder(context)
+                .setTitle(R.string.pif_wipe_playstore_title)
+                .setMessage(messageRes)
+                .setPositiveButton(R.string.pif_wipe_confirm, (dialog, which) -> {
+                    try {
+                        context.getPackageManager().clearApplicationUserData(
+                                "com.android.vending", null);
+                    } catch (RuntimeException e) {
+                        Log.w(TAG, "Could not clear Play Store data", e);
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
     static void resetDefaults(ContentResolver cr) {
         Settings.Secure.putLong(cr, PIF_LAST_FETCH, 0L);
         putString(cr, Settings.Secure.SPOOF_TRICKYSTORE_TARGET,
@@ -192,7 +217,8 @@ final class SpoofStore {
         out.put("DEVICE", profile.device);
         out.put("FINGERPRINT", profile.fingerprint);
         out.put("SECURITY_PATCH", profile.securityPatch);
-        out.put("DEVICE_INITIAL_SDK_INT", "32");
+        out.put("DEVICE_INITIAL_SDK_INT",
+                PixelDeviceRepository.getInitialSdkInt(profile.device));
         if (profile.isCanary && profile.securityPatch != null && profile.securityPatch.length() >= 7) {
             out.put("_canary_month", profile.securityPatch.substring(0, 7));
         }

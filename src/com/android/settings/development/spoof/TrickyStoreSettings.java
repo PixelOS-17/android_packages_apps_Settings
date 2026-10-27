@@ -172,6 +172,7 @@ public class TrickyStoreSettings extends DashboardFragment implements DeveloperO
             SpoofStore.putString(cr, SpoofStore.KEYBOX_SOURCE, SpoofStore.SOURCE_USER);
             SpoofStore.stopGms(requireContext());
             toast(getString(R.string.ts_keybox_imported));
+            SpoofStore.confirmClearPlayStore(requireContext(), R.string.ts_wipe_playstore_message);
             refresh();
         } catch (Exception e) {
             toast(getString(R.string.ts_failed, e.getMessage()));

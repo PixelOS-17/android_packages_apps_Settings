@@ -32,11 +32,6 @@
         android:persistent="false" />
 
     <Preference
-        android:key="ts_fetch_keybox"
-        android:title="@string/ts_fetch_keybox"
-        android:persistent="false" />
-
-    <Preference
         android:key="ts_delete_keybox"
         android:title="@string/ts_delete_keybox"
         android:persistent="false" />

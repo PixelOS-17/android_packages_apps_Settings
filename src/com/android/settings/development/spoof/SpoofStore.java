@@ -59,9 +59,6 @@ final class SpoofStore {
     static final String PIF_LAST_FETCH = "spoof_pif_last_auto_fetch";
     static final String KEYBOX_SOURCE = "spoof_trickystore_keybox_source";
     static final String SOURCE_USER = "user";
-    static final String SOURCE_OFFICIAL = "official";
-    static final String KEYBOX_URL =
-            "https://git.evolution-x.org/EvoX/keybox/raw/branch/main/keybox.xml";
 
     static final String PP_TARGETS = "pi_pp_targets";
     static final String PP_MODEL = "pi_pp_model";

@@ -21,7 +21,7 @@
     <string name="spoofing_identity_category">Device identity</string>
     <string name="spoofing_app_specific_category">App-specific overrides</string>
 
-    <string name="tricky_store_title">TrickyStore</string>
+    <string name="tricky_store_title">Attestation</string>
     <string name="tricky_store_summary">Keybox and target apps for attestation</string>
     <string name="play_integrity_fix_title">Play Integrity Fix</string>
     <string name="play_integrity_fix_summary">Fingerprint and build fields served to DroidGuard</string>
@@ -32,7 +32,7 @@
 
     <string name="spoofing_reset_defaults_title">Reset to defaults</string>
     <string name="spoofing_reset_defaults_dialog_title">Reset spoofing settings?</string>
-    <string name="spoofing_reset_defaults_dialog_message">This clears the Play Integrity config and the security patch override, and restores the default TrickyStore target list. The keybox and the enable switches are kept. A new fingerprint is fetched shortly afterwards.</string>
+    <string name="spoofing_reset_defaults_dialog_message">This clears the Play Integrity config and the security patch override, and restores the default target list. The keybox and the enable switches are kept. A new fingerprint is fetched shortly afterwards.</string>
     <string name="spoofing_reset_defaults_confirm">Reset</string>
     <string name="spoofing_reset_defaults_done">Spoofing settings reset</string>
 
